@@ -1,0 +1,31 @@
+<template>
+  <Header />
+  <LandingPage />
+  <Footer />
+</template>
+
+<script>
+import LandingPage from './components/LandingPage.vue'
+import Header from './components/Header.vue'
+import Footer from './components/Footer.vue'
+
+export default {
+  name: 'Index',
+  components: {
+    LandingPage,
+    Header,
+    Footer
+  }
+}
+</script>
+
+<style>
+#index {
+  font-family: Avenir, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-align: left;
+  color: black;
+  margin: 60px;
+}
+</style>

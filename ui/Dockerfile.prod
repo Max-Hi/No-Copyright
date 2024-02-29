@@ -1,0 +1,39 @@
+# build environment
+FROM node:16 as build
+ARG API_URL
+ARG STATIC_FILES_HOSTNAME
+
+WORKDIR /app
+
+# add `/app/node_modules/.bin` to $PATH
+ENV PATH /app/node_modules/.bin:$PATH
+
+# install app dependencies
+COPY package.json ./
+COPY package-lock.json ./
+RUN npm install
+# install tailwind
+RUN npm install -D tailwindcss postcss autoprefixer
+RUN npx tailwindcss init -p
+
+RUN npm install react-scripts@3.4.1 -g
+
+# add app
+COPY . ./
+
+# set production variables
+RUN sed -i "s%DEBUG =.*%DEBUG = false%" ./src/api/index.js
+RUN sed -i "s%API_URL =.*%API_URL = \"${API_URL}\"%" ./src/api/index.js
+RUN sed -i "s%STATIC_FILES_HOSTNAME =.*%STATIC_FILES_HOSTNAME = \"${STATIC_FILES_HOSTNAME}\"%" ./src/main.js
+RUN sed -i "s%http://localhost:9000%${STATIC_FILES_HOSTNAME}%" ./src/main.css
+
+RUN npm run build
+
+# production environment
+FROM nginx:stable-alpine
+RUN rm -r /usr/share/nginx/html/*
+COPY --from=build /app/dist /usr/share/nginx/html
+COPY production-nginx.conf /etc/nginx/nginx.conf
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]
+

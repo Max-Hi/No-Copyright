@@ -1,0 +1,20 @@
+FROM python:3.10-alpine
+
+WORKDIR /app
+
+COPY api ./flask_api
+COPY setup.py ./
+
+RUN sed -i "s/LOCAL_DEV =.*/LOCAL_DEV = False/" ./flask_api/__init__.py
+RUN sed -i "s/DBHOST =.*/DBHOST = 'db'/" ./flask_api/__init__.py
+
+RUN python setup.py bdist_wheel
+RUN pip install ./dist/api-*
+
+RUN pip install waitress
+EXPOSE 80
+
+CMD waitress-serve --listen=0.0.0.0:80 --call 'flask_api:create_app' 
+
+
+

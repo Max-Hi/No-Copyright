@@ -1,0 +1,3 @@
+[submodule "dupes"]
+	path = dupes
+	url = https://github.com/JustinAzoff/dupes.git
